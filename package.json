@@ -12,7 +12,7 @@
   },
   "name": "quiz-server",
   "version": "1.0.0",
-  "main": "./lib/index.js",
+  "main": "./lib/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "tsc",
@@ -26,6 +26,5 @@
   "files": [
     "./bin/*",
     "./lib/*"
-  ],
-  "typings": "./lib/index.d.ts"
+  ]
 }
