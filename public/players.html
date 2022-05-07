@@ -1,0 +1,175 @@
+<html lang="en">
+    <head>
+        <title>Divine the Sentinels</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link rel="stylesheet" type="text/css" href="players.css">
+    </head>
+
+    <body>
+        <div class="App">
+            <div class="container">
+                <div class="answer-inputs">
+                    <div class="answer-input-container">
+                        <div class="input-label">
+                            <span><b><em>1</em></b></span>
+                        </div>
+
+                        <input class="answer-input" oninput="sendInput(this.value, 0)">
+                        </input>
+
+                        <div class="reveal">
+                            <span><b class="reveal-text">?</b></span>
+                        </div>
+                    </div>
+
+                    <div class="answer-input-container">
+                        <div class="input-label">
+                            <span><b><em>2</em></b></span>
+                        </div>
+
+                        <input class="answer-input" oninput="sendInput(this.value, 1)">
+                        </input>
+
+                        <div class="reveal">
+                            <span><b class="reveal-text">?</b></span>
+                        </div>
+                    </div>
+
+                    <div class="answer-input-container">
+                        <div class="input-label">
+                            <span><b><em>3</em></b></span>
+                        </div>
+
+                        <input class="answer-input" oninput="sendInput(this.value, 2)">
+                        </input>
+
+                        <div class="reveal">
+                            <span><b class="reveal-text">?</b></span>
+                        </div>
+                    </div>
+
+                    <div class="answer-input-container">
+                        <div class="input-label">
+                            <span><b><em>4</em></b></span>
+                        </div>
+
+                        <input class="answer-input" oninput="sendInput(this.value, 3)">
+                        </input>
+
+                        <div class="reveal">
+                            <span><b class="reveal-text">?</b></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-window">
+                    <h1>Divine the Sentinels</h1>
+                    <p>Summon the Sentinels' wisdom...</p>
+
+                    <div class="chat-messages"></div>
+
+                    <textarea
+                        id="chat-input"
+                        placeholder="Your message here..."
+                        oninput="setMessage(this.value)"></textarea>
+
+                    <button class="send-button" onClick="sendMessage()" disabled>Send</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://momentjs.com/downloads/moment.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+
+        <script>
+            let message = ""
+
+            const setMessage = m => {
+                message = m
+                document.querySelector(".send-button").disabled = message.length <= 0
+            }
+
+            const socket = io()
+
+            socket.on("inputs", inputs => {
+                for (let i = 0; i < inputs.length; i++) {
+                    let revealText = document.querySelectorAll(".answer-input")[i]
+                    revealText.value = inputs[i]
+                }
+            })
+
+            socket.on("reveal", reveal => {
+                for (let i = 0; i < reveal.length; i++) {
+                    let revealText = document.querySelectorAll(".reveal-text")[i]
+                    revealText.replaceChildren(document.createTextNode(reveal[i]))
+                }
+            })
+
+            socket.on("chatLog", messages => {
+                let chatMessagesDiv = document.querySelector(".chat-messages")
+                chatMessagesDiv.replaceChildren([])
+
+                for (let m of messages) {
+                    let newDiv = renderMessage(m)
+                    chatMessagesDiv.appendChild(newDiv)
+                }
+
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight
+            })
+
+            document.querySelector("#chat-input").addEventListener("keyup", e => {
+                if (e.key === "Enter") {
+                    sendMessage()
+                }
+            })
+
+            const renderMessage = m => {
+                let newDiv = document.createElement("div")
+
+                newDiv.className = "message-content"
+                if (m.fromSentinels) {
+                    newDiv.className += " sentinels"
+                }
+
+                let timestampSpan = document.createElement("span")
+
+                let timestampStr = document.createTextNode("[" + moment.unix(m.timestamp).format("DD/MM/YYYY HH:mm:ss") + "] ")
+                timestampSpan.appendChild(timestampStr)
+
+                newDiv.appendChild(timestampSpan)
+
+                let senderSpan = document.createElement("span")
+
+                let sender = m.fromSentinels ? "Sentinels" : "You"
+                let senderStr = document.createTextNode(sender + ": ")
+                senderSpan.appendChild(senderStr)
+
+                newDiv.appendChild(senderSpan)
+
+                let messageSpan = document.createElement("span")
+
+                let messageStr = document.createTextNode(m.content)
+                messageSpan.appendChild(messageStr)
+
+                newDiv.appendChild(messageSpan)
+
+                return newDiv
+            }
+
+            const sendInput = (input, index) => {
+                socket.emit("newInput", [input, index])
+            }
+
+            const sendMessage = () => {
+                if (message.length > 0) {
+                    socket.emit("newPlayersMessage", message)
+
+                    message = ""
+                    document.querySelector("textarea").value = ""
+                }
+            }
+        </script>
+    </body>
+</html>

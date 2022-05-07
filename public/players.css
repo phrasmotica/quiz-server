@@ -1,0 +1,144 @@
+body {
+    margin: 0;
+}
+
+.App {
+    background: black;
+    color: green;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "Courier New", Courier, monospace;
+    text-align: center;
+}
+
+.App ::selection {
+    background: green;
+    color: black;
+}
+
+.App ::-moz-selection {
+    background: green;
+    color: black;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.answer-inputs {
+    width: 30vw;
+}
+
+.answer-inputs > :not(:first-child) {
+    margin-top: 1em;
+}
+
+.answer-input-container {
+    display: flex;
+    align-items: center;
+}
+
+.answer-input-container .input-label {
+    margin-right: 0.5em;
+    font-size: 24pt;
+}
+
+.answer-input {
+    max-width: 20vw;
+    background: black;
+    color: green;
+    padding-bottom: 0.1em;
+    border: none;
+    border-bottom: 1px solid green;
+    font-size: 24pt;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.answer-input:focus {
+    outline-width: 0;
+}
+
+.reveal {
+    min-width: 1em;
+    margin-left: 0.3em;
+    font-size: 24pt;
+}
+
+.chat-window {
+    width: 30vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-window ::-webkit-scrollbar {
+    width: 15px;
+}
+
+.chat-window ::-webkit-scrollbar-track {
+    background: black;
+}
+
+.chat-window ::-webkit-scrollbar-thumb {
+    background: green;
+}
+
+.chat-window ::-webkit-scrollbar-corner {
+    background: black;
+}
+
+.chat-messages {
+    height: 30vh;
+    overflow-y: scroll;
+    background: black;
+    color: green;
+    padding: 0.5em;
+    border: 1px solid green;
+    font-size: 12pt;
+    font-family: "Courier New", Courier, monospace;
+    text-align: start;
+}
+
+.message-content.sentinels {
+    color: white;
+}
+
+.chat-messages > :not(:first-child) {
+    margin-top: 0.2em;
+}
+
+.chat-window textarea {
+    overflow-y: scroll;
+    resize: none;
+    background: black;
+    color: green;
+    padding: 10px;
+    border: 1px solid green;
+    margin-top: 10px;
+    font-size: 12pt;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.chat-window textarea:focus {
+    outline-width: 0;
+}
+
+.send-button {
+    background: black;
+    color: green;
+    padding: 10px;
+    border: 1px solid green;
+    margin-top: 10px;
+    font-size: 16pt;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.send-button:hover:not(:disabled) {
+    background: green;
+    color: black;
+    cursor: pointer;
+}
