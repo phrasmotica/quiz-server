@@ -1,3 +1,4 @@
+import "dotenv/config"
 import express from "express"
 import { createServer } from "http"
 import path from "path"
@@ -28,9 +29,14 @@ const io = new Server(http)
 
 const roomName = "MainRoom"
 
-const answers = ["coil", "broadcast", "the cure", "art of noise"]
-const inputs = ["", "", "", ""]
-const reveal = "4715"
+const answers = process.env.ANSWERS?.split(";") ?? []
+log("answers are %s", answers.join(", "))
+
+const inputs = answers.map(_ => "")
+
+const reveal = process.env.REVEAL ?? ""
+log("reveal is %s", reveal)
+
 
 const computeCurrentReveal = () => {
     let currentReveal = reveal
