@@ -1,5 +1,5 @@
 export class InputManager {
-    private readonly inputs: string[]
+    private inputs: string[]
 
     public constructor(
         private readonly answers: string[],
@@ -10,6 +10,10 @@ export class InputManager {
 
     public getInputs() {
         return this.inputs
+    }
+
+    public loadInputs(inputs: string[]) {
+        this.inputs = inputs
     }
 
     public setInput(input: string, index: number) {

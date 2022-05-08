@@ -4,6 +4,7 @@ import { duration } from "moment"
 import path from "path"
 
 import { ChatManager, Message } from "./ChatManager"
+import { InputManager } from "./InputManager"
 import { log } from "./Logging"
 
 export class BackupManager {
@@ -12,17 +13,21 @@ export class BackupManager {
     private backupTimer!: NodeJS.Timer | null
 
     public constructor(
-        private chatManager: ChatManager,
+        private readonly chatManager: ChatManager,
+        private readonly inputManager: InputManager
     ) {
         this.backupFilePath = path.resolve("./public/backup.json")
-        this.load()
     }
 
     public start(backupIntervalHours: number) {
+        this.load()
+
         let backupIntervalMs = backupIntervalHours * 60 * 60 * 1000
+        backupIntervalMs = 10000
         this.backupTimer = setInterval(() => this.backup(), backupIntervalMs)
 
-        log("backup interval is %s", duration({ hours: backupIntervalHours }).humanize())
+        let humanised = duration({ milliseconds: backupIntervalMs }).humanize()
+        log("backup interval is %s", humanised)
     }
 
     public stop() {
@@ -51,6 +56,7 @@ export class BackupManager {
     private createBackupData() {
         return {
             timestamp: moment().utc().unix(),
+            inputs: this.inputManager.getInputs(),
             chatLog: this.chatManager.getMessages(),
         } as BackupData
     }
@@ -63,7 +69,7 @@ export class BackupManager {
                 log("failed to back up data! Error: %s", err.message)
             }
             else {
-                log("backed up data, including %d messages from chat log", backupData.chatLog.length)
+                log("backed up data: %d input(s), %d chat log message(s)", backupData.inputs.length, backupData.chatLog.length)
             }
         })
     }
@@ -74,8 +80,12 @@ export class BackupManager {
                 log("failed to load backup data! Error: %s", err.message)
             }
             else {
-                let contents = JSON.parse(data.toString()) as BackupData
-                this.chatManager.loadMessages(contents.chatLog)
+                let backupData = JSON.parse(data.toString()) as BackupData
+
+                this.chatManager.loadMessages(backupData.chatLog)
+                this.inputManager.loadInputs(backupData.inputs)
+
+                log("loaded backup data: %d input(s), %d chat log message(s)", backupData.inputs.length, backupData.chatLog.length)
             }
         })
     }
@@ -83,5 +93,6 @@ export class BackupManager {
 
 interface BackupData {
     timestamp: number
+    inputs: string[]
     chatLog: Message[]
 }

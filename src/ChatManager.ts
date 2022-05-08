@@ -1,5 +1,4 @@
 import moment from "moment"
-import { log } from "./Logging"
 
 export class ChatManager {
     private messages: Message[] = []
@@ -10,8 +9,6 @@ export class ChatManager {
 
     public loadMessages(messages: Message[]) {
         this.messages = messages
-
-        log("loaded %d messages into chat log", this.messages.length)
     }
 
     public pushPlayersMessage(message: string) {

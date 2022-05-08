@@ -27,14 +27,6 @@ app.get("/oversee", (_req, res) => {
 
 const chatManager = new ChatManager()
 
-const backupIntervalHours = Number(process.env.BACKUP_INTERVAL_HOURS ?? 1)
-const backupManager = new BackupManager(chatManager)
-backupManager.start(backupIntervalHours)
-
-const io = new Server(http)
-
-const roomName = "MainRoom"
-
 const answers = process.env.ANSWERS?.split(";") ?? []
 log("answers are %s", answers.join(", "))
 
@@ -42,6 +34,15 @@ const reveal = process.env.REVEAL ?? ""
 log("reveal is %s", reveal)
 
 const inputManager = new InputManager(answers, reveal)
+
+const backupManager = new BackupManager(chatManager, inputManager)
+
+const backupIntervalHours = Number(process.env.BACKUP_INTERVAL_HOURS ?? 1)
+backupManager.start(backupIntervalHours)
+
+const io = new Server(http)
+
+const roomName = "MainRoom"
 
 io.on("connection", socket => {
     log("client connected on socket %s from %s", socket.id, socket.handshake.address)
