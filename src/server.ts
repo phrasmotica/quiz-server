@@ -23,7 +23,8 @@ app.get("/oversee", (_req, res) => {
     res.sendFile(path.resolve("./public/sentinels.html"))
 })
 
-let chatManager = new ChatManager()
+const backupIntervalHours = Number(process.env.BACKUP_INTERVAL_HOURS ?? 1)
+let chatManager = new ChatManager(backupIntervalHours)
 
 const io = new Server(http)
 

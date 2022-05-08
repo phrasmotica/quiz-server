@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "fs"
-import moment from "moment"
+import moment, { duration } from "moment"
 import path from "path"
 import { log } from "./Logging"
 
@@ -8,11 +8,13 @@ export class ChatManager {
 
     private messages: Message[] = []
 
-    public constructor() {
+    public constructor(backupIntervalHours: number) {
         this.load()
 
-        // backup chat log every 30 minutes
-        setInterval(() => this.backup(), 1000 * 60 * 30)
+        let backupIntervalMs = backupIntervalHours * 60 * 60 * 1000
+        setInterval(() => this.backup(), backupIntervalMs)
+
+        log("backup interval is %s", duration({ hours: backupIntervalHours }).humanize())
     }
 
     public getMessages() {
