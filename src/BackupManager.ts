@@ -23,7 +23,6 @@ export class BackupManager {
         this.load()
 
         let backupIntervalMs = backupIntervalHours * 60 * 60 * 1000
-        backupIntervalMs = 10000
         this.backupTimer = setInterval(() => this.backup(), backupIntervalMs)
 
         let humanised = duration({ milliseconds: backupIntervalMs }).humanize()

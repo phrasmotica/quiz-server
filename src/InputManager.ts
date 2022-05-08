@@ -20,13 +20,17 @@ export class InputManager {
         this.inputs[index] = input
     }
 
+    private inputIsCorrect(index: number) {
+        return this.inputs[index].toLowerCase() === this.answers[index].toLowerCase()
+    }
+
     public getCurrentReveal() {
         let currentReveal = this.reveal
 
         const replace = (str: string, index: number) => str.substring(0, index) + "?" + str.substring(index + 1)
 
         for (let i = 0; i < currentReveal.length; i++) {
-            if (this.inputs[i] !== this.answers[i]) {
+            if (!this.inputIsCorrect(i)) {
                 currentReveal = replace(currentReveal, i)
             }
         }

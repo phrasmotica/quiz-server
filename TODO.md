@@ -9,7 +9,7 @@
 
 * [x] back up players' inputs
 * [x] add environment variable for backup interval
-* [ ] match inputs against a list of acceptable answers
+* [x] flatten to lower case when determining input correctness
 * [ ] add button to Sentinels' page for clearing all inputs
 * [ ] add buttons to Sentinels' page for clearing each input
 * [ ] add button to Sentinels' page for clearing all chat messages
