@@ -6,6 +6,7 @@ import { Server } from "socket.io"
 
 import { BackupManager } from "./BackupManager"
 import { ChatManager } from "./ChatManager"
+import { InputManager } from "./InputManager"
 import { log } from "./Logging"
 
 const app = express()
@@ -37,39 +38,26 @@ const roomName = "MainRoom"
 const answers = process.env.ANSWERS?.split(";") ?? []
 log("answers are %s", answers.join(", "))
 
-const inputs = answers.map(_ => "")
-
 const reveal = process.env.REVEAL ?? ""
 log("reveal is %s", reveal)
 
-
-const computeCurrentReveal = () => {
-    let currentReveal = reveal
-
-    for (let i = 0; i < currentReveal.length; i++) {
-        if (inputs[i] !== answers[i]) {
-            currentReveal = replace(currentReveal, i)
-        }
-    }
-
-    return currentReveal
-}
-
-const replace = (str: string, index: number) => str.substring(0, index) + "?" + str.substring(index + 1)
+const inputManager = new InputManager(answers, reveal)
 
 io.on("connection", socket => {
     log("client connected on socket %s from %s", socket.id, socket.handshake.address)
 
     socket.join(roomName)
 
-    socket.emit("inputs", inputs)
-    socket.emit("reveal", computeCurrentReveal())
+    socket.emit("inputs", inputManager.getInputs())
+    socket.emit("reveal", inputManager.getCurrentReveal())
+
     socket.emit("chatLog", chatManager.getMessages())
 
     socket.on("newInput", (data: [string, number]) => {
-        inputs[data[1]] = data[0]
-        io.in(roomName).emit("inputs", inputs)
-        io.in(roomName).emit("reveal", computeCurrentReveal())
+        inputManager.setInput(data[0], data[1])
+
+        io.in(roomName).emit("inputs", inputManager.getInputs())
+        io.in(roomName).emit("reveal", inputManager.getCurrentReveal())
     })
 
     socket.on("newPlayersMessage", (message: string) => {
