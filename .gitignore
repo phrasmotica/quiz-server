@@ -132,5 +132,5 @@ dist
 # build files
 lib/
 
-# chat logs
-public/chatLog.json
+# backup files
+public/backup.json

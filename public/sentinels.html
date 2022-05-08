@@ -16,7 +16,7 @@
                             <span><b><em>1</em></b></span>
                         </div>
 
-                        <input class="answer-input" value="getValue(0)" disabled>
+                        <input class="answer-input" disabled>
                         </input>
 
                         <div class="reveal">
@@ -162,7 +162,7 @@
                 if (message.length > 0) {
                     socket.emit("newSentinelsMessage", message)
 
-                    message = ""
+                    setMessage("")
                     document.querySelector("textarea").value = ""
                 }
             }

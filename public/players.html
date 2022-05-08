@@ -166,7 +166,7 @@
                 if (message.length > 0) {
                     socket.emit("newPlayersMessage", message)
 
-                    message = ""
+                    setMessage("")
                     document.querySelector("textarea").value = ""
                 }
             }

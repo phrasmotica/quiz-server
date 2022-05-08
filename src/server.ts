@@ -1,10 +1,13 @@
 import "dotenv/config"
 import express from "express"
 import { createServer } from "http"
+import moment from "moment"
 import path from "path"
 import { Server } from "socket.io"
 
+import { BackupManager } from "./BackupManager"
 import { ChatManager } from "./ChatManager"
+import { InputManager } from "./InputManager"
 import { log } from "./Logging"
 
 const app = express()
@@ -15,6 +18,13 @@ app.use(express.static(path.resolve("./public")))
 
 let http = createServer(app)
 
+app.get("/", (_req, res) => {
+    res.send({
+        timestamp: moment().utc().format(),
+        build: process.env.BUILD_ID ?? "N/A",
+    })
+})
+
 app.get("/play", (_req, res) => {
     res.sendFile(path.resolve("./public/players.html"))
 })
@@ -23,48 +33,40 @@ app.get("/oversee", (_req, res) => {
     res.sendFile(path.resolve("./public/sentinels.html"))
 })
 
-let chatManager = new ChatManager()
-
-const io = new Server(http)
-
-const roomName = "MainRoom"
+const chatManager = new ChatManager()
 
 const answers = process.env.ANSWERS?.split(";") ?? []
 log("answers are %s", answers.join(", "))
 
-const inputs = answers.map(_ => "")
-
 const reveal = process.env.REVEAL ?? ""
 log("reveal is %s", reveal)
 
+const inputManager = new InputManager(answers, reveal)
 
-const computeCurrentReveal = () => {
-    let currentReveal = reveal
+const backupManager = new BackupManager(chatManager, inputManager)
 
-    for (let i = 0; i < currentReveal.length; i++) {
-        if (inputs[i] !== answers[i]) {
-            currentReveal = replace(currentReveal, i)
-        }
-    }
+const backupIntervalHours = Number(process.env.BACKUP_INTERVAL_HOURS ?? 1)
+backupManager.start(backupIntervalHours)
 
-    return currentReveal
-}
+const io = new Server(http)
 
-const replace = (str: string, index: number) => str.substring(0, index) + "?" + str.substring(index + 1)
+const roomName = "MainRoom"
 
 io.on("connection", socket => {
     log("client connected on socket %s from %s", socket.id, socket.handshake.address)
 
     socket.join(roomName)
 
-    socket.emit("inputs", inputs)
-    socket.emit("reveal", computeCurrentReveal())
+    socket.emit("inputs", inputManager.getInputs())
+    socket.emit("reveal", inputManager.getCurrentReveal())
+
     socket.emit("chatLog", chatManager.getMessages())
 
     socket.on("newInput", (data: [string, number]) => {
-        inputs[data[1]] = data[0]
-        io.in(roomName).emit("inputs", inputs)
-        io.in(roomName).emit("reveal", computeCurrentReveal())
+        inputManager.setInput(data[0], data[1])
+
+        io.in(roomName).emit("inputs", inputManager.getInputs())
+        io.in(roomName).emit("reveal", inputManager.getCurrentReveal())
     })
 
     socket.on("newPlayersMessage", (message: string) => {
