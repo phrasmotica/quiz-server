@@ -1,6 +1,7 @@
 import "dotenv/config"
 import express from "express"
 import { createServer } from "http"
+import moment from "moment"
 import path from "path"
 import { Server } from "socket.io"
 
@@ -16,6 +17,13 @@ app.set("port", process.env.PORT || 5000)
 app.use(express.static(path.resolve("./public")))
 
 let http = createServer(app)
+
+app.get("/", (_req, res) => {
+    res.send({
+        timestamp: moment().utc().format(),
+        build: process.env.BUILD_ID ?? "N/A",
+    })
+})
 
 app.get("/play", (_req, res) => {
     res.sendFile(path.resolve("./public/players.html"))

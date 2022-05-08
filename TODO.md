@@ -10,7 +10,4 @@
 * [x] back up players' inputs
 * [x] add environment variable for backup interval
 * [x] flatten to lower case when determining input correctness
-* [ ] add button to Sentinels' page for clearing all inputs
-* [ ] add buttons to Sentinels' page for clearing each input
-* [ ] add button to Sentinels' page for clearing all chat messages
-* [ ] add buttons to Sentinels' page for clearing individual chat messages
+* [x] add status page
