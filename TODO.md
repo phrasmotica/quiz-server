@@ -7,6 +7,7 @@
 
 ## Features
 
+* [ ] back up players' inputs
 * [x] add environment variable for backup interval
 * [ ] match inputs against a list of acceptable answers
 * [ ] add button to Sentinels' page for clearing all inputs
