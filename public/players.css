@@ -142,3 +142,25 @@ body {
     color: black;
     cursor: pointer;
 }
+
+@media screen and (max-width: 900px) {
+    .container {
+        flex-direction: column;
+        padding-top: 1em;
+    }
+
+    .answer-inputs {
+        width: 90%;
+        margin-bottom: 1em;
+    }
+
+    .answer-input {
+        max-width: unset;
+        width: 90%;
+    }
+
+    .chat-window {
+        width: 90%;
+        margin-bottom: 1em;
+    }
+}
